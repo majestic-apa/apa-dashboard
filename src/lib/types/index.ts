@@ -83,3 +83,102 @@ export interface AgentNetworkNode {
   lead: Agent;
   agents: Agent[];
 }
+
+// ── Commission ───────────────────────────────────────────────────────────────
+
+export interface CommissionRates {
+  agent_per_onboarding: number;
+  lead_override_per_onboarding: number;
+  agent_per_contribution: number;
+  lead_override_per_contribution: number;
+}
+
+export interface AgentCommissionSummary {
+  agent_code: string;
+  agent_name: string;
+  agent_type: 'lead' | 'field';
+  lead_code: string | null;
+  lead_name: string | null;
+  completed_onboardings: number;
+  completed_contributions: number;
+  direct_commission: number;
+  override_commission: number;
+  total_commission: number;
+}
+
+export interface LeadCommissionSummary {
+  lead_code: string;
+  lead_name: string;
+  total_onboardings: number;
+  total_contributions: number;
+  lead_override_commission: number;
+  agents: AgentCommissionSummary[];
+  team_total_commission: number;
+}
+
+export interface CommissionSummary {
+  rates: CommissionRates;
+  leads: LeadCommissionSummary[];
+  totals: {
+    total_onboardings: number;
+    total_contributions: number;
+    total_agent_commission: number;
+    total_lead_commission: number;
+    grand_total: number;
+  };
+}
+
+// ── PenCom-compliant operational logs (no customer PII) ──────────────────────
+
+export interface OnboardingLog {
+  id: string;
+  apa_session_id: string;
+  pfa_ack_ref: string | null;
+  pfa_code: string;
+  channel: 'android_app' | 'ios_app' | 'ussd' | 'offline_sync';
+  product_type: 'micro_pension' | 'voluntary_contribution';
+  status: 'initiated' | 'submitted' | 'pfa_confirmed' | 'failed' | 'rejected';
+  error_code: string | null;
+  http_status: number | null;
+  agent_name: string;
+  agent_code: string;
+  lead_name: string;
+  lead_code: string;
+  agent_app_version: string;
+  timestamp_submitted: string;
+}
+
+export interface ContributionLog {
+  id: string;
+  apa_session_id: string;
+  pfa_ack_ref: string | null;
+  pfa_code: string;
+  channel: 'android_app' | 'ios_app' | 'ussd' | 'offline_sync';
+  product_type: 'micro_pension' | 'voluntary_contribution';
+  status: 'initiated' | 'submitted' | 'pfa_confirmed' | 'failed';
+  error_code: string | null;
+  http_status: number | null;
+  agent_name: string;
+  agent_code: string;
+  lead_name: string;
+  lead_code: string;
+  agent_app_version: string;
+  timestamp_submitted: string;
+}
+
+export interface WithdrawalLog {
+  id: string;
+  apa_session_id: string;
+  pfa_ack_ref: string | null;
+  pfa_code: string;
+  channel: 'android_app' | 'ios_app' | 'ussd' | 'offline_sync';
+  status: 'initiated' | 'submitted' | 'pfa_confirmed' | 'rejected';
+  error_code: string | null;
+  http_status: number | null;
+  agent_name: string;
+  agent_code: string;
+  lead_name: string;
+  lead_code: string;
+  agent_app_version: string;
+  timestamp_submitted: string;
+}

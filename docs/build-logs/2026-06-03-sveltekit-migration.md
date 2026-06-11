@@ -247,3 +247,157 @@ All mutations (login, CRUD, profile update) use **SvelteKit form actions** (`+pa
 ### `structuredClone` for mock isolation
 
 Each API function returns `structuredClone(mockData)` so that mutations to the returned object do not affect the original mock arrays.
+
+---
+
+## Update 1 — PenCom-Compliant Log Tabs (2026-06-04)
+
+### What was added and why
+
+The old "Activity Log" tab stored and displayed customer-facing data (`customer_name`, `customer_phone`, `rsa_pin`, `pfa_pin`) that is classified as PII under PenCom guidelines. It was replaced with three operational log tabs that record only system-level metadata about each transaction — no customer identity or financial data is stored.
+
+### Files modified
+
+| File | Change |
+|------|--------|
+| `src/lib/types/index.ts` | Added `OnboardingLog`, `ContributionLog`, `WithdrawalLog` interfaces |
+| `src/lib/mock/reports.ts` | Added `mockOnboardingLog` (10 records), `mockContributionLog` (9), `mockWithdrawalLog` (8) |
+| `src/lib/api/reports.ts` | Added `getOnboardingLog()`, `getContributionLog()`, `getWithdrawalLog()`; marked `getActivityLog()` as legacy |
+| `src/routes/reports/+page.server.ts` | Replaced `activityLog` parallel load with three new log loads |
+| `src/routes/reports/+page.svelte` | Replaced 4-tab layout with 6-tab layout; removed Activity Log tab; added three new log tabs |
+
+### The three log types
+
+#### OnboardingLog
+Tracks a new RSA/pension member registration attempt end-to-end.
+
+| Column | Meaning |
+|--------|---------|
+| `apa_session_id` | Unique APA-generated session reference for the operation |
+| `pfa_ack_ref` | Confirmation reference returned by the PFA API on success |
+| `pfa_code` | PFA receiving the registration (ARM, STA, NLPC, PAL) |
+| `channel` | App channel used by the agent |
+| `product_type` | micro_pension or voluntary_contribution |
+| `status` | Lifecycle stage of the submission |
+| `error_code` | PFA-returned error code if failed/rejected |
+| `http_status` | Raw HTTP response code from the PFA API |
+| `agent_name/code` | The sub-agent who performed the onboarding |
+| `lead_name/code` | The super-agent (lead) the agent belongs to |
+| `agent_app_version` | Version of the agent mobile app at the time |
+| `timestamp_submitted` | UTC ISO timestamp of submission |
+
+#### ContributionLog
+Tracks a pension contribution deposit attempt. Identical structure to OnboardingLog except the `product_type` field is stored but not displayed (kept for backend analytics).
+
+#### WithdrawalLog
+Tracks a micro-pension withdrawal request. No `product_type` field (withdrawals are not product-scoped). Rejection codes are financial: `INSUFFICIENT_BALANCE`, `PENDING_VERIFICATION`.
+
+### What is intentionally NOT stored (PII list)
+
+- Customer name, phone number, address
+- RSA PIN / PFA PIN
+- NIN, BVN, date of birth
+- Account number, bank details
+- Any field that identifies the pension beneficiary
+
+The log records only *who submitted the operation* (agent/lead) and *what the system response was* (status, error code, HTTP code). This satisfies PenCom Circular No. PenCom/Tech/2022/001 on data minimisation.
+
+### Tabs in the updated Reports page
+
+| # | Tab | Restricted |
+|---|-----|-----------|
+| 1 | Staff Summary | No |
+| 2 | Agent Summary | No |
+| 3 | Onboarding Log | No |
+| 4 | Contribution Log | No |
+| 5 | Withdrawal Log | No |
+| 6 | Agent Network | super_admin + management only |
+
+### Filtering logic
+
+All filtering is client-side using `$derived.by()` — no server round trips. Each log tab has independent filter state:
+- **Search** — matches `agent_name`, `agent_code`, `lead_code`, `apa_session_id`, `pfa_ack_ref`
+- **Date From / To** — filters by `timestamp_submitted`
+- **Status dropdown** — exact match on `status`; "All Statuses" shows everything
+
+The generic `applyLogFilter<T extends LogRecord>()` function handles all three tabs. Each tab's `$derived.by()` call passes its own bound state variables.
+
+### How to add real FastAPI data
+
+When Suleiman's API is ready, in `src/lib/api/reports.ts`:
+
+1. Set `VITE_MOCK_API=false`
+2. The three new functions already have the real endpoints:
+   - `GET /reports/onboarding-log`
+   - `GET /reports/contribution-log`
+   - `GET /reports/withdrawal-log`
+3. If Suleiman uses different path names, update only the string literal in the `else` branch of each function — the mock branch is untouched.
+
+---
+
+## Update 2 — Commission Feature (2026-06-11)
+
+### What was added
+
+A commission calculation layer was added to the Agent Network tab in the Reports page. It is visible only to `super_admin` and `management` roles.
+
+### Files created or modified
+
+| File | Change |
+|------|--------|
+| `src/lib/types/index.ts` | Added `CommissionRates`, `AgentCommissionSummary`, `LeadCommissionSummary`, `CommissionSummary` |
+| `src/lib/mock/commission.ts` | New file — full `CommissionSummary` object with verified pre-calculated figures |
+| `src/lib/api/reports.ts` | Added `getCommissionSummary()` with MOCK_API fallback |
+| `src/routes/reports/+page.server.ts` | Added `parent()` call to read user role; loads `commissionSummary` only for authorised roles |
+| `src/routes/reports/+page.svelte` | Updated Agent Network tab: summary cards, per-lead/per-agent commission display, Commission Summary table |
+
+### How commission is calculated
+
+**Flat-fee model** — identical rates for all agents and leads.
+
+```
+Agent direct commission   = completed_onboardings × ₦100
+                          + completed_contributions × ₦50
+
+Lead override commission  = team_total_onboardings × ₦30
+                          + team_total_contributions × ₦15
+
+Team total                = sum of agent direct commissions + lead override
+```
+
+### Current placeholder figures (mock data)
+
+| Lead | Agents | Onboardings | Agent Direct | Override | Team Total |
+|------|--------|-------------|-------------|---------|-----------|
+| SPA-0001 Chukwuemeka Okafor | 3 | 44 | ₦5,850 | ₦1,755 | ₦7,605 |
+| SPA-0002 Fatima Abubakar | 3 | 40 | ₦5,300 | ₦1,590 | ₦6,890 |
+| SPA-0003 Biodun Adeleke | 2 | 19 | ₦2,550 | ₦765 | ₦3,315 |
+| **Grand Total** | **8** | **103** | **₦13,700** | **₦4,110** | **₦17,810** |
+
+### How to update the rates
+
+Rates are defined in a single place: `src/lib/mock/commission.ts`
+
+```typescript
+export const COMMISSION_RATES: CommissionRates = {
+  agent_per_onboarding: 100,           // change here
+  lead_override_per_onboarding: 30,    // change here
+  agent_per_contribution: 50,          // change here
+  lead_override_per_contribution: 15   // change here
+};
+```
+
+All commission figures in the mock are calculated using `COMMISSION_RATES` at module load time — changing the constants automatically propagates to all totals.
+
+When rates are confirmed and the real API is wired up, rates will come from the API response — no further frontend changes needed as the formula is the same.
+
+### Access control
+
+| Layer | How it works |
+|-------|-------------|
+| Server | `+page.server.ts` calls `parent()` to read the user's role from the layout. If role is not `super_admin` or `management`, `commissionSummary: null` is returned — the data is never sent to the browser. |
+| Client | `canViewCommission` derived from `user?.role`. All commission UI is inside `{#if canViewCommission && commissionSummary}` guards. |
+
+### What Suleiman needs to build
+
+`GET /api/v1/reports/commission` — returns a `CommissionSummary`-shaped JSON object. The frontend endpoint string is already wired in `src/lib/api/reports.ts`. When `VITE_MOCK_API=false`, the real endpoint will be called automatically.

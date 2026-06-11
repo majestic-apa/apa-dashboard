@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
   import type { ActionData } from './$types';
+  import logoSrc from '$lib/assets/majestic_logo.png';
 
   let { form }: { form: ActionData } = $props();
 
@@ -15,20 +16,12 @@
 
 <div class="flex min-h-screen items-center justify-center px-4" style="background-color: #082b67;">
   <div class="w-full max-w-sm">
-    <!-- Logo mark -->
-    <div class="mb-8 text-center">
-      <div
-        class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg text-lg font-bold"
-        style="background-color: #febf26; color: #082b67;"
-      >
-        M
-      </div>
-      <h1 class="text-xl font-bold text-white">Majestic APA</h1>
-      <p class="mt-1 text-sm text-white/50">Pension Administration Dashboard</p>
-    </div>
-
     <!-- Card -->
     <div class="rounded-xl bg-white px-8 py-8 shadow-2xl">
+      <!-- Logo inside card — transparent bg reads perfectly on white -->
+      <div class="mb-6 flex justify-center">
+        <img src={logoSrc} alt="Majestic APA" class="h-auto w-40" />
+      </div>
       <h2 class="mb-6 text-base font-semibold text-gray-800">Sign in to your account</h2>
 
       {#if form?.error}

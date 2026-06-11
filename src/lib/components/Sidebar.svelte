@@ -3,6 +3,7 @@
   import { enhance } from '$app/forms';
   import { formatRole } from '$lib/stores/auth.svelte';
   import type { User } from '$lib/types';
+  import logoSrc from '$lib/assets/majestic_logo.png';
 
   let { user }: { user: User | null } = $props();
 
@@ -22,16 +23,13 @@
   style="background-color: #082b67;"
 >
   <!-- Logo -->
-  <div class="flex items-center gap-3 px-5 py-6">
-    <div
-      class="flex h-9 w-9 shrink-0 items-center justify-center rounded font-bold text-navy text-sm"
-      style="background-color: #febf26; color: #082b67;"
-    >
-      M
-    </div>
-    <div>
-      <p class="font-semibold text-white text-sm leading-tight">Majestic APA</p>
-      <p class="text-xs text-white/50 leading-tight">Pension Administration</p>
+  <div class="px-5 py-4">
+    <div class="overflow-hidden rounded-xl bg-white/95 px-3 py-2.5 shadow-sm">
+      <img
+        src={logoSrc}
+        alt="Majestic APA"
+        class="block h-auto w-full max-h-36 object-contain"
+      />
     </div>
   </div>
 
