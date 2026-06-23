@@ -12,6 +12,8 @@ export const mockUser: User = {
 
 export const mockAuthResponse: AuthResponse = {
   access_token: 'mock-jwt-token-super-admin',
+  refresh_token: 'mock-refresh-token',
   token_type: 'bearer',
+  device_id: 'mock-device-id',
   user: mockUser
 };

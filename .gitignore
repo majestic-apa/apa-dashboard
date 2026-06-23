@@ -21,3 +21,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Mock CSV data — copy manually from shared location, do not commit
+static/mock-data/

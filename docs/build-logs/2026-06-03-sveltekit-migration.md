@@ -401,3 +401,213 @@ When rates are confirmed and the real API is wired up, rates will come from the 
 ### What Suleiman needs to build
 
 `GET /api/v1/reports/commission` — returns a `CommissionSummary`-shaped JSON object. The frontend endpoint string is already wired in `src/lib/api/reports.ts`. When `VITE_MOCK_API=false`, the real endpoint will be called automatically.
+
+---
+
+## Update 3 — CSV-backed Mock Data (2026-06-11)
+
+### What was changed
+
+The hardcoded mock arrays for onboarding, contribution, and withdrawal logs were replaced with data loaded from CSV files. Commission totals now derive from the CSV data rather than hardcoded counts.
+
+### Files created or modified
+
+| File | Change |
+|------|--------|
+| `src/lib/utils/csv.ts` | New — RFC-4180-compatible CSV parser (handles quoted fields, Windows line endings) |
+| `src/lib/mock/reports.ts` | Now reads `static/mock-data/*.csv` at server startup; falls back to compact hardcoded arrays if CSVs are absent |
+| `src/lib/mock/commission.ts` | Now derives agent counts and lead totals from imported log arrays — no hardcoded numbers |
+| `.gitignore` | Added `static/mock-data/` to prevent CSV files from being committed |
+
+### CSV file location and format
+
+```
+static/mock-data/
+  onboarding_data.csv     — 120 records
+  contribution_data.csv   —  80 records
+  withdrawal_data.csv     —  40 records
+```
+
+These files are **gitignored** — they must be copied manually to `static/mock-data/` on each developer machine.
+
+### CSV column → TypeScript field mapping
+
+| CSV column | Maps to | Notes |
+|------------|---------|-------|
+| `session_id` | `apa_session_id` | |
+| `apa_ref` | `id` | |
+| `pfa_ref` | `pfa_ack_ref` (null if empty) | |
+| `pfa_ref` segment[1] | `pfa_code` | e.g. "PFA-CIT-xxx" → "CIT" |
+| `pfa_name` | fallback for `pfa_code` if `pfa_ref` empty | |
+| `status: completed` | `pfa_confirmed` | |
+| `status: pending` | `submitted` | |
+| `status: rejected` | `rejected` | |
+| `product: PPP` | `micro_pension` | onboarding only |
+| `product: VC` | `voluntary_contribution` | onboarding only |
+| `submitted_at` | `timestamp_submitted` | space→T+Z appended |
+
+### How commission re-calculates from CSV
+
+1. `mock/reports.ts` loads and maps CSV → exports `mockOnboardingLog` and `mockContributionLog`
+2. `mock/commission.ts` imports those arrays and scans for `status === 'pfa_confirmed'`
+3. Counts per `agent_code` → derives direct and override commissions via `COMMISSION_RATES`
+4. No hardcoded counts anywhere — the numbers are fully data-driven
+
+### How to regenerate or replace CSV files
+
+Drop replacement CSVs into `static/mock-data/` and restart the dev server (`npm run dev`). The new counts are picked up automatically.
+
+### Fallback behaviour
+
+If `static/mock-data/` is missing or a CSV fails to parse, `tryLoad()` in `reports.ts` logs a warning and exports the built-in 10/9/8-record fallback arrays. The dev server continues to function without the CSVs.
+
+---
+
+## Update 4 — Agent Type Terminology Rename + Real FastAPI Integration (2026-06-23)
+
+### What was changed
+
+Two related tasks completed in one session: (1) renamed all internal agent-type terminology to match the FastAPI naming convention, and (2) wired the real FastAPI endpoints for auth, staff, and agents while keeping reports on mock.
+
+---
+
+### Part A — Terminology Rename
+
+The old `super_agent` / `sub_agent` naming was replaced throughout the codebase to match what the real API uses.
+
+| Old | New |
+|-----|-----|
+| `agent_type: 'super_agent'` | `agent_type: 'lead'` |
+| `agent_type: 'sub_agent'` | `agent_type: 'field'` |
+| `super_agent_id` | `lead_agent_id` |
+| `super_agent_name` | `lead_agent_name` |
+| `super_agent_code` | `lead_agent_code` |
+| Query param `?type=super_agent` | `?agent_type=lead` |
+| Query param `?type=sub_agent` | `?agent_type=field` |
+| Form field `name="super_agent_id"` | `name="lead_agent_id"` |
+| Label "Lead (Super Agent)" | "Lead" |
+
+Files modified:
+
+| File | Change |
+|------|--------|
+| `src/lib/types/index.ts` | Updated `Agent.agent_type` union, renamed three `super_agent_*` fields |
+| `src/lib/mock/agents.ts` | All 8 agents and 3 leads updated; `AgentActivity` fields renamed |
+| `src/lib/mock/reports.ts` | Filter `a.super_agent_id === lead.id` updated to `a.lead_agent_id` |
+| `src/lib/api/agents.ts` | Query params updated |
+| `src/routes/staff/+page.server.ts` | Form field reads, mock object creation updated |
+| `src/routes/staff/+page.svelte` | Table column, modal select updated |
+
+---
+
+### Part B — Real FastAPI Integration
+
+#### Base URL
+
+```
+https://staging.majesticpensionagent.tech
+```
+
+Set in `.env`:
+
+```
+VITE_MOCK_API=false
+VITE_API_URL=https://staging.majesticpensionagent.tech
+```
+
+#### How to switch between mock and real
+
+| Mode | `.env` setting | Behaviour |
+|------|---------------|-----------|
+| Mock (default) | `VITE_MOCK_API=true` | All data from local mock arrays and CSV files. Any credentials work. No network calls. |
+| Real | `VITE_MOCK_API=false` | Calls FastAPI staging server. Real credentials required. |
+
+Both modes compile and run identically. Switching requires only a `.env` change and `npm run dev` restart.
+
+#### Endpoints wired
+
+| Feature | Endpoint | Notes |
+|---------|----------|-------|
+| Login | `POST /api/v1/auth/internal/login` | Body: `{ email, password }` |
+| Current user | `GET /api/v1/users/me` | Returns user with `is_superuser` |
+| Token refresh | `POST /api/v1/auth/refresh` | Body: `{ refresh_token }` |
+| Staff list | `GET /api/v1/users` | Assumed -- confirm with Suleiman |
+| Staff create | `POST /api/v1/users` | Body includes `password` |
+| Staff edit | `PATCH /api/v1/users/{id}` | |
+| Staff toggle | `POST /api/v1/users/{id}/toggle` | Replaces separate deactivate/reactivate |
+| Password reset | `POST /api/v1/users/{id}/reset-password` | Body: `{ new_password }` |
+| Lead list | `GET /api/v1/agents?agent_type=lead` | |
+| Field agent list | `GET /api/v1/agents?agent_type=field` | |
+| Agent create | `POST /api/v1/agents` | |
+| Agent edit | `PATCH /api/v1/agents/{id}` | |
+| Agent toggle | `POST /api/v1/agents/{id}/toggle` | Replaces separate deactivate/reactivate |
+
+**What stays on mock:** all reports endpoints (`staffSummary`, `agentSummary`, onboarding/contribution/withdrawal logs, agent network, commission) remain on mock because Suleiman has not yet built these. When ready, update `src/lib/api/reports.ts` strings and set `VITE_MOCK_API=false`.
+
+#### Token refresh flow
+
+1. Login response returns `access_token` (7-day), `refresh_token` (30-day), and `device_id`.
+2. All three are stored as **httpOnly cookies** -- never exposed to client JavaScript.
+3. On every page load, `+layout.server.ts` calls `GET /api/v1/users/me` with the access token.
+4. If that returns **401** and a `refresh_token` cookie exists, the layout silently calls `POST /api/v1/auth/refresh`.
+5. If refresh succeeds: new `auth_token` and `refresh_token` cookies are written and the page load continues.
+6. If refresh fails (expired or revoked): all three cookies are deleted and the user is redirected to `/login`.
+7. Logout (`POST /logout`) always deletes all three cookies.
+
+#### Role derivation from `is_superuser`
+
+The FastAPI returns `is_superuser: boolean` instead of a role enum. The `mapApiUser()` function in `src/lib/api/auth.ts` converts this:
+
+```typescript
+role: raw.is_superuser
+  ? 'super_admin'
+  : ((raw.role as User['role']) ?? 'operations')
+```
+
+- `is_superuser: true` always maps to `'super_admin'`
+- `is_superuser: false` uses the `role` field from the API response if present, falls back to `'operations'`
+
+Confirm with Suleiman that the user endpoint returns a `role` string for non-superusers.
+
+#### Toggle endpoint replacing separate deactivate/reactivate
+
+The real API exposes a single toggle endpoint (`POST .../toggle`) rather than separate deactivate and reactivate endpoints. Both the `deactivateStaff`/`reactivateStaff` and `deactivateLead`/`reactivateLead` and `deactivateAgent`/`reactivateAgent` form actions now call the same toggle function in real mode. The mock still uses separate paths for clarity.
+
+#### Files modified or created
+
+| File | Change |
+|------|--------|
+| `src/lib/types/index.ts` | `AuthResponse` updated: added `refresh_token: string`, `device_id: string` |
+| `src/lib/mock/auth.ts` | `mockAuthResponse` updated with mock `refresh_token` and `device_id` values |
+| `src/lib/api/auth.ts` | Rewritten: real endpoints, `mapApiUser()` role derivation, `refreshAccessToken()` |
+| `src/lib/api/staff.ts` | Real endpoints added; new `toggleStaff()` function |
+| `src/lib/api/agents.ts` | Real endpoints added; new `toggleAgent()` function |
+| `src/routes/login/+page.server.ts` | Now sets three cookies: `auth_token` (7d), `refresh_token` (30d), `device_id` (30d) |
+| `src/routes/logout/+server.ts` | Now clears all three cookies |
+| `src/routes/+layout.server.ts` | Added token refresh flow on 401 before giving up |
+| `src/routes/staff/+page.server.ts` | `load()` now calls real API when `MOCK_API=false`; all 13 actions now have real API paths with `try/catch` error handling |
+
+#### How to test with real credentials
+
+```bash
+# 1. Set real mode
+echo 'VITE_MOCK_API=false' >> .env
+echo 'VITE_API_URL=https://staging.majesticpensionagent.tech' >> .env
+
+# 2. Start the server
+npm run dev
+
+# 3. Navigate to http://localhost:5173
+# 4. Log in with real Majestic APA internal credentials
+```
+
+If the staging server is down or credentials are wrong, the login page shows the API error message directly from the response body.
+
+#### Assumptions pending confirmation with Suleiman
+
+- Staff endpoint base path is `/api/v1/users` (not `/api/v1/staff` or similar)
+- Agent endpoint base path is `/api/v1/agents`
+- Toggle endpoint suffix is `/toggle`
+- Password reset body key is `new_password`
+- Non-superuser users have a `role` field in the `/users/me` response
+- Token refresh endpoint is `POST /api/v1/auth/refresh` with body `{ refresh_token }`

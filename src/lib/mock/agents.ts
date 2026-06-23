@@ -4,7 +4,7 @@ export const mockLeads: Agent[] = [
   {
     id: 'l1',
     agent_code: 'SPA-0001',
-    agent_type: 'super_agent',
+    agent_type: 'lead',
     first_name: 'Chukwuemeka',
     last_name: 'Okafor',
     email: 'c.okafor@gmail.com',
@@ -13,14 +13,14 @@ export const mockLeads: Agent[] = [
     state: 'Lagos',
     lga: 'Surulere',
     is_active: true,
-    super_agent_id: null,
-    super_agent_name: null,
-    super_agent_code: null
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null
   },
   {
     id: 'l2',
     agent_code: 'SPA-0002',
-    agent_type: 'super_agent',
+    agent_type: 'lead',
     first_name: 'Fatima',
     last_name: 'Abubakar',
     email: 'f.abubakar@yahoo.com',
@@ -29,14 +29,14 @@ export const mockLeads: Agent[] = [
     state: 'Kano',
     lga: 'Kano Municipal',
     is_active: true,
-    super_agent_id: null,
-    super_agent_name: null,
-    super_agent_code: null
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null
   },
   {
     id: 'l3',
     agent_code: 'SPA-0003',
-    agent_type: 'super_agent',
+    agent_type: 'lead',
     first_name: 'Biodun',
     last_name: 'Adeleke',
     email: null,
@@ -45,9 +45,9 @@ export const mockLeads: Agent[] = [
     state: 'Oyo',
     lga: 'Ibadan North',
     is_active: true,
-    super_agent_id: null,
-    super_agent_name: null,
-    super_agent_code: null
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null
   }
 ];
 
@@ -55,7 +55,7 @@ export const mockAgents: Agent[] = [
   {
     id: 'a1',
     agent_code: 'APA-0001',
-    agent_type: 'sub_agent',
+    agent_type: 'field',
     first_name: 'Emmanuel',
     last_name: 'Nwosu',
     email: 'e.nwosu@gmail.com',
@@ -64,14 +64,14 @@ export const mockAgents: Agent[] = [
     state: 'Lagos',
     lga: 'Oshodi-Isolo',
     is_active: true,
-    super_agent_id: 'l1',
-    super_agent_name: 'Chukwuemeka Okafor',
-    super_agent_code: 'SPA-0001'
+    lead_agent_id: 'l1',
+    lead_agent_name: 'Chukwuemeka Okafor',
+    lead_agent_code: 'SPA-0001'
   },
   {
     id: 'a2',
     agent_code: 'APA-0002',
-    agent_type: 'sub_agent',
+    agent_type: 'field',
     first_name: 'Ngozi',
     last_name: 'Eze',
     email: null,
@@ -80,14 +80,14 @@ export const mockAgents: Agent[] = [
     state: 'Lagos',
     lga: 'Lagos Island',
     is_active: true,
-    super_agent_id: 'l1',
-    super_agent_name: 'Chukwuemeka Okafor',
-    super_agent_code: 'SPA-0001'
+    lead_agent_id: 'l1',
+    lead_agent_name: 'Chukwuemeka Okafor',
+    lead_agent_code: 'SPA-0001'
   },
   {
     id: 'a3',
     agent_code: 'APA-0003',
-    agent_type: 'sub_agent',
+    agent_type: 'field',
     first_name: 'Ibrahim',
     last_name: 'Musa',
     email: 'i.musa@gmail.com',
@@ -96,14 +96,14 @@ export const mockAgents: Agent[] = [
     state: 'Kano',
     lga: 'Fagge',
     is_active: true,
-    super_agent_id: 'l2',
-    super_agent_name: 'Fatima Abubakar',
-    super_agent_code: 'SPA-0002'
+    lead_agent_id: 'l2',
+    lead_agent_name: 'Fatima Abubakar',
+    lead_agent_code: 'SPA-0002'
   },
   {
     id: 'a4',
     agent_code: 'APA-0004',
-    agent_type: 'sub_agent',
+    agent_type: 'field',
     first_name: 'Aisha',
     last_name: 'Usman',
     email: null,
@@ -112,14 +112,14 @@ export const mockAgents: Agent[] = [
     state: 'Kano',
     lga: 'Gwale',
     is_active: false,
-    super_agent_id: 'l2',
-    super_agent_name: 'Fatima Abubakar',
-    super_agent_code: 'SPA-0002'
+    lead_agent_id: 'l2',
+    lead_agent_name: 'Fatima Abubakar',
+    lead_agent_code: 'SPA-0002'
   },
   {
     id: 'a5',
     agent_code: 'APA-0005',
-    agent_type: 'sub_agent',
+    agent_type: 'field',
     first_name: 'Taiwo',
     last_name: 'Adeyemi',
     email: 't.adeyemi@yahoo.com',
@@ -128,14 +128,14 @@ export const mockAgents: Agent[] = [
     state: 'Lagos',
     lga: 'Agege',
     is_active: true,
-    super_agent_id: 'l1',
-    super_agent_name: 'Chukwuemeka Okafor',
-    super_agent_code: 'SPA-0001'
+    lead_agent_id: 'l1',
+    lead_agent_name: 'Chukwuemeka Okafor',
+    lead_agent_code: 'SPA-0001'
   },
   {
     id: 'a6',
     agent_code: 'APA-0006',
-    agent_type: 'sub_agent',
+    agent_type: 'field',
     first_name: 'Segun',
     last_name: 'Afolabi',
     email: 's.afolabi@gmail.com',
@@ -144,14 +144,14 @@ export const mockAgents: Agent[] = [
     state: 'Oyo',
     lga: 'Ibadan North',
     is_active: true,
-    super_agent_id: 'l3',
-    super_agent_name: 'Biodun Adeleke',
-    super_agent_code: 'SPA-0003'
+    lead_agent_id: 'l3',
+    lead_agent_name: 'Biodun Adeleke',
+    lead_agent_code: 'SPA-0003'
   },
   {
     id: 'a7',
     agent_code: 'APA-0007',
-    agent_type: 'sub_agent',
+    agent_type: 'field',
     first_name: 'Blessing',
     last_name: 'Okonkwo',
     email: null,
@@ -160,14 +160,14 @@ export const mockAgents: Agent[] = [
     state: 'Oyo',
     lga: 'Ibadan South-West',
     is_active: true,
-    super_agent_id: 'l3',
-    super_agent_name: 'Biodun Adeleke',
-    super_agent_code: 'SPA-0003'
+    lead_agent_id: 'l3',
+    lead_agent_name: 'Biodun Adeleke',
+    lead_agent_code: 'SPA-0003'
   },
   {
     id: 'a8',
     agent_code: 'APA-0008',
-    agent_type: 'sub_agent',
+    agent_type: 'field',
     first_name: 'Yusuf',
     last_name: 'Garba',
     email: 'y.garba@gmail.com',
@@ -176,9 +176,9 @@ export const mockAgents: Agent[] = [
     state: 'Kano',
     lga: 'Sabon Gari',
     is_active: true,
-    super_agent_id: 'l2',
-    super_agent_name: 'Fatima Abubakar',
-    super_agent_code: 'SPA-0002'
+    lead_agent_id: 'l2',
+    lead_agent_name: 'Fatima Abubakar',
+    lead_agent_code: 'SPA-0002'
   }
 ];
 
@@ -193,10 +193,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Alimosho',
     rsa_pin: 'PEN100012345678',
     pfa_pin: 'APA-PEN-001',
-    super_agent_name: 'Chukwuemeka Okafor',
-    super_agent_code: 'SPA-0001',
-    sub_agent_name: 'Emmanuel Nwosu',
-    sub_agent_code: 'APA-0001',
+    lead_name: 'Chukwuemeka Okafor',
+    lead_code: 'SPA-0001',
+    field_agent_name: 'Emmanuel Nwosu',
+    field_agent_code: 'APA-0001',
     performed_at: '2026-05-28T09:15:00Z'
   },
   {
@@ -209,10 +209,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Ikeja',
     rsa_pin: 'PEN100023456789',
     pfa_pin: 'APA-PEN-002',
-    super_agent_name: 'Chukwuemeka Okafor',
-    super_agent_code: 'SPA-0001',
-    sub_agent_name: 'Ngozi Eze',
-    sub_agent_code: 'APA-0002',
+    lead_name: 'Chukwuemeka Okafor',
+    lead_code: 'SPA-0001',
+    field_agent_name: 'Ngozi Eze',
+    field_agent_code: 'APA-0002',
     performed_at: '2026-05-29T10:30:00Z'
   },
   {
@@ -225,10 +225,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Kano Municipal',
     rsa_pin: 'PEN100034567890',
     pfa_pin: 'APA-PEN-003',
-    super_agent_name: 'Fatima Abubakar',
-    super_agent_code: 'SPA-0002',
-    sub_agent_name: 'Ibrahim Musa',
-    sub_agent_code: 'APA-0003',
+    lead_name: 'Fatima Abubakar',
+    lead_code: 'SPA-0002',
+    field_agent_name: 'Ibrahim Musa',
+    field_agent_code: 'APA-0003',
     performed_at: '2026-05-30T08:00:00Z'
   },
   {
@@ -241,10 +241,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Agege',
     rsa_pin: 'PEN100045678901',
     pfa_pin: 'APA-PEN-004',
-    super_agent_name: 'Chukwuemeka Okafor',
-    super_agent_code: 'SPA-0001',
-    sub_agent_name: 'Taiwo Adeyemi',
-    sub_agent_code: 'APA-0005',
+    lead_name: 'Chukwuemeka Okafor',
+    lead_code: 'SPA-0001',
+    field_agent_name: 'Taiwo Adeyemi',
+    field_agent_code: 'APA-0005',
     performed_at: '2026-06-01T11:20:00Z'
   },
   {
@@ -257,10 +257,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Ibadan North',
     rsa_pin: 'PEN100056789012',
     pfa_pin: 'APA-PEN-005',
-    super_agent_name: 'Biodun Adeleke',
-    super_agent_code: 'SPA-0003',
-    sub_agent_name: 'Segun Afolabi',
-    sub_agent_code: 'APA-0006',
+    lead_name: 'Biodun Adeleke',
+    lead_code: 'SPA-0003',
+    field_agent_name: 'Segun Afolabi',
+    field_agent_code: 'APA-0006',
     performed_at: '2026-06-01T14:45:00Z'
   },
   {
@@ -273,10 +273,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Ibadan South-West',
     rsa_pin: 'PEN100067890123',
     pfa_pin: 'APA-PEN-006',
-    super_agent_name: 'Biodun Adeleke',
-    super_agent_code: 'SPA-0003',
-    sub_agent_name: 'Blessing Okonkwo',
-    sub_agent_code: 'APA-0007',
+    lead_name: 'Biodun Adeleke',
+    lead_code: 'SPA-0003',
+    field_agent_name: 'Blessing Okonkwo',
+    field_agent_code: 'APA-0007',
     performed_at: '2026-06-02T09:00:00Z'
   },
   {
@@ -289,10 +289,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Sabon Gari',
     rsa_pin: 'PEN100078901234',
     pfa_pin: 'APA-PEN-007',
-    super_agent_name: 'Fatima Abubakar',
-    super_agent_code: 'SPA-0002',
-    sub_agent_name: 'Yusuf Garba',
-    sub_agent_code: 'APA-0008',
+    lead_name: 'Fatima Abubakar',
+    lead_code: 'SPA-0002',
+    field_agent_name: 'Yusuf Garba',
+    field_agent_code: 'APA-0008',
     performed_at: '2026-06-02T10:15:00Z'
   },
   {
@@ -305,10 +305,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Oshodi-Isolo',
     rsa_pin: 'PEN100089012345',
     pfa_pin: 'APA-PEN-008',
-    super_agent_name: 'Chukwuemeka Okafor',
-    super_agent_code: 'SPA-0001',
-    sub_agent_name: 'Emmanuel Nwosu',
-    sub_agent_code: 'APA-0001',
+    lead_name: 'Chukwuemeka Okafor',
+    lead_code: 'SPA-0001',
+    field_agent_name: 'Emmanuel Nwosu',
+    field_agent_code: 'APA-0001',
     performed_at: '2026-06-02T13:30:00Z'
   },
   {
@@ -321,10 +321,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Fagge',
     rsa_pin: 'PEN100090123456',
     pfa_pin: 'APA-PEN-009',
-    super_agent_name: 'Fatima Abubakar',
-    super_agent_code: 'SPA-0002',
-    sub_agent_name: 'Ibrahim Musa',
-    sub_agent_code: 'APA-0003',
+    lead_name: 'Fatima Abubakar',
+    lead_code: 'SPA-0002',
+    field_agent_name: 'Ibrahim Musa',
+    field_agent_code: 'APA-0003',
     performed_at: '2026-06-03T08:45:00Z'
   },
   {
@@ -337,10 +337,10 @@ export const mockAgentActivity: AgentActivity[] = [
     customer_lga: 'Ibadan North',
     rsa_pin: 'PEN100101234567',
     pfa_pin: 'APA-PEN-010',
-    super_agent_name: 'Biodun Adeleke',
-    super_agent_code: 'SPA-0003',
-    sub_agent_name: 'Segun Afolabi',
-    sub_agent_code: 'APA-0006',
+    lead_name: 'Biodun Adeleke',
+    lead_code: 'SPA-0003',
+    field_agent_name: 'Segun Afolabi',
+    field_agent_code: 'APA-0006',
     performed_at: '2026-06-03T11:00:00Z'
   }
 ];

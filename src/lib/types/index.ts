@@ -11,7 +11,7 @@ export interface User {
 export interface Agent {
   id: string;
   agent_code: string;
-  agent_type: 'super_agent' | 'sub_agent';
+  agent_type: 'lead' | 'field';
   first_name: string;
   last_name: string;
   email: string | null;
@@ -20,9 +20,9 @@ export interface Agent {
   state: string;
   lga: string;
   is_active: boolean;
-  super_agent_id: string | null;
-  super_agent_name: string | null;
-  super_agent_code: string | null;
+  lead_agent_id: string | null;
+  lead_agent_name: string | null;
+  lead_agent_code: string | null;
 }
 
 export interface StaffMember {
@@ -44,16 +44,18 @@ export interface AgentActivity {
   customer_lga: string;
   rsa_pin: string;
   pfa_pin: string;
-  super_agent_name: string | null;
-  super_agent_code: string | null;
-  sub_agent_name: string | null;
-  sub_agent_code: string | null;
+  lead_name: string | null;
+  lead_code: string | null;
+  field_agent_name: string | null;
+  field_agent_code: string | null;
   performed_at: string;
 }
 
 export interface AuthResponse {
   access_token: string;
+  refresh_token: string;
   token_type: string;
+  device_id: string;
   user: User;
 }
 

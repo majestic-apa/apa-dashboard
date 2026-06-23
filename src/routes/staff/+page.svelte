@@ -79,7 +79,7 @@
         !q ||
         `${a.first_name} ${a.last_name}`.toLowerCase().includes(q) ||
         a.agent_code.toLowerCase().includes(q) ||
-        (a.super_agent_name ?? '').toLowerCase().includes(q) ||
+        (a.lead_agent_name ?? '').toLowerCase().includes(q) ||
         a.state.toLowerCase().includes(q)
       );
     })
@@ -270,7 +270,7 @@
             <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50">
               <td class="px-5 py-3 font-mono text-xs font-semibold text-gray-600">{a.agent_code}</td>
               <td class="px-5 py-3 font-medium text-gray-800">{a.first_name} {a.last_name}</td>
-              <td class="px-5 py-3 text-gray-500">{a.super_agent_name ?? '—'}</td>
+              <td class="px-5 py-3 text-gray-500">{a.lead_agent_name ?? '—'}</td>
               <td class="px-5 py-3 text-gray-500">{a.phone_number}</td>
               <td class="px-5 py-3 text-gray-500">{a.state} / {a.lga}</td>
               <td class="px-5 py-3">
@@ -519,11 +519,11 @@
             <input type="hidden" name="id" value={selectedAgent?.id} />
           {/if}
           <div>
-            <label for="ma-super_agent_id" class="form-label">Lead (Super Agent)</label>
-            <select id="ma-super_agent_id" name="super_agent_id" required class="form-input">
+            <label for="ma-lead_agent_id" class="form-label">Lead</label>
+            <select id="ma-lead_agent_id" name="lead_agent_id" required class="form-input">
               <option value="">— Select a lead —</option>
               {#each data.leads.filter((l) => l.is_active) as l}
-                <option value={l.id} selected={selectedAgent?.super_agent_id === l.id}>
+                <option value={l.id} selected={selectedAgent?.lead_agent_id === l.id}>
                   {l.agent_code} — {l.first_name} {l.last_name}
                 </option>
               {/each}
