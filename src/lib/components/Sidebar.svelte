@@ -5,12 +5,13 @@
   import type { User } from '$lib/types';
   import logoSrc from '$lib/assets/majestic_logo.png';
 
-  let { user }: { user: User | null } = $props();
+  let { user, unreadCount = 0 }: { user: User | null; unreadCount?: number } = $props();
 
-  const navLinks: { label: string; href: string; roles?: string[] }[] = [
+  const navLinks: { label: string; href: string; roles?: string[]; badge?: boolean }[] = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Staff', href: '/staff' },
     { label: 'Team', href: '/team', roles: ['super_admin', 'management'] },
+    { label: 'Messages', href: '/messages', badge: true },
     { label: 'Reports', href: '/reports' }
   ];
 
@@ -47,7 +48,7 @@
       {@const active = isActive(link.href)}
       <a
         href={link.href}
-        class="relative mb-1 flex items-center rounded px-4 py-2.5 text-xs font-semibold uppercase tracking-widest transition-colors
+        class="relative mb-1 flex items-center justify-between rounded px-4 py-2.5 text-xs font-semibold uppercase tracking-widest transition-colors
           {active
           ? 'bg-white/10 text-white'
           : 'text-white/60 hover:bg-white/5 hover:text-white'}"
@@ -58,7 +59,15 @@
             style="background-color: #febf26;"
           ></span>
         {/if}
-        {link.label}
+        <span>{link.label}</span>
+        {#if link.badge && unreadCount > 0}
+          <span
+            class="ml-2 inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-xs font-bold leading-none text-white"
+            style="background-color: #dc2626;"
+          >
+            {unreadCount}
+          </span>
+        {/if}
       </a>
     {/each}
   </nav>

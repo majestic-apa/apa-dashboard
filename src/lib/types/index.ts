@@ -228,10 +228,37 @@ export interface Message {
   id: string;
   subject: string;
   body: string;
-  sender_name: string;
   sender_id: string;
-  recipients: 'all' | 'rm' | 'manager' | 'lead' | 'field';
+  sender_name: string;
+  sender_role: string;
+  recipients: 'all' | 'rm' | 'manager' | 'lead' | 'field' | 'management';
   same_group_only: boolean;
+  recipient_ids: string[] | null;
+  message_type: 'general' | 'complaint' | 'announcement';
   created_at: string;
   read: boolean;
+  read_at: string | null;
+}
+
+export interface MessageThread {
+  id: string;
+  subject: string;
+  messages: Message[];
+  participants: string[];
+  last_message_at: string;
+  unread_count: number;
+}
+
+export interface Complaint {
+  id: string;
+  subject: string;
+  body: string;
+  sender_id: string;
+  sender_name: string;
+  sender_code: string;
+  status: 'open' | 'in_progress' | 'resolved';
+  response: string | null;
+  responded_by: string | null;
+  responded_at: string | null;
+  created_at: string;
 }

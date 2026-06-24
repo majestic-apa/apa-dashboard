@@ -2,6 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { getMe, refreshAccessToken } from '$lib/api/auth';
 import { ApiError } from '$lib/api/client';
+import { getUnreadCount } from '$lib/api/messages';
 
 const PUBLIC_PATHS = ['/login'];
 const COOKIE_BASE = {
@@ -23,7 +24,7 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
   if (PUBLIC_PATHS.includes(path)) {
     const token = cookies.get('auth_token');
     if (token) redirect(302, '/dashboard');
-    return { user: null };
+    return { user: null, unreadCount: 0 };
   }
 
   const token = cookies.get('auth_token');
@@ -31,7 +32,8 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
 
   try {
     const user = await getMe(token);
-    return { user };
+    const unreadCount = await getUnreadCount(token).catch(() => 0);
+    return { user, unreadCount };
   } catch (e) {
     // On 401, attempt a silent token refresh before giving up
     if (e instanceof ApiError && e.status === 401) {
@@ -50,7 +52,8 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
             });
           }
           const user = await getMe(newTokens.access_token);
-          return { user };
+          const unreadCount = await getUnreadCount(newTokens.access_token).catch(() => 0);
+          return { user, unreadCount };
         } catch {
           // Refresh also failed -- fall through to clear cookies
         }

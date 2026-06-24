@@ -19,7 +19,7 @@
   {@render children()}
 {:else}
   <div class="flex h-screen overflow-hidden bg-gray-50">
-    <Sidebar user={data.user ?? null} />
+    <Sidebar user={data.user ?? null} unreadCount={data.unreadCount ?? 0} />
     <main class="flex-1 overflow-y-auto">
       {@render children()}
     </main>

@@ -678,3 +678,64 @@ Endpoints to confirm with Suleiman when ready:
 ### Result
 
 `npm run check` -- 620 files, 0 errors, 0 warnings.
+
+---
+
+## Update 6 -- Messaging System (2026-06-24)
+
+### What was built
+
+In-app messaging with three tabs: Inbox, Compose, Complaints. All data is mock only -- no real API endpoints exist yet.
+
+### Types added (`src/lib/types/index.ts`)
+
+- `Message` -- updated (was minimal stub): added `sender_role`, `recipient_ids`, `message_type`, `read_at`; `recipients` gains `'management'` value; `message_type: 'general' | 'complaint' | 'announcement'`
+- `MessageThread` -- new; groups messages into a thread (placeholder for future threading)
+- `Complaint` -- new; separate from Message; tracks status, response, and responder
+
+### New files
+
+- `src/lib/mock/messages.ts` -- 4 mock messages (2 announcements, 2 general); 3 mock complaints (resolved, in_progress, open); exports `mockUnreadCount`
+- `src/lib/api/messages.ts` -- 7 functions with MOCK_API guard: `getMessages`, `sendMessage`, `markAsRead`, `getUnreadCount`, `getComplaints`, `submitComplaint`, `respondToComplaint`; in-memory stores survive for the server instance lifetime so mark-as-read and new messages persist within a session
+- `src/routes/messages/+page.server.ts` -- `load()` fetches messages + complaints (complaints gated to super_admin/management); 4 actions: `send`, `markRead`, `complaint`, `respond`
+- `src/routes/messages/+page.svelte` -- 3-tab Messages page (described below)
+
+### Messages page tabs
+
+**Inbox** -- shows all messages; search by subject/sender; filter by type (All / Announcements / General); unread messages have navy left border and bold subject; click to expand full body; Mark as Read button on expanded messages (optimistic local update via use:enhance, no page reload); unread count badge on tab title.
+
+**Compose** -- visible to `super_admin` and `management` only; form: subject, message (textarea, min 10 chars), send to (Everyone / Regional Managers / Managers / Leads / Field Agents), message type (General / Announcement), same group only checkbox; success message shown inline after send.
+
+**Complaints** -- two sub-tabs:
+- My Complaints: shows complaints where sender_id matches current user; empty state with link to form; submit new complaint form; status badges (open=red, in_progress=amber, resolved=green); shows response when resolved.
+- All Complaints: visible to super_admin and management only; table with name, code, subject, status, date, action columns; Respond button expands inline response form per row; optimistic local update on response sent.
+
+### Sidebar / layout changes
+
+- `src/lib/components/Sidebar.svelte` -- Messages link added between Team and Reports (visible to all roles); red badge shows unread count from layout data; `unreadCount?: number` added to props
+- `src/routes/+layout.server.ts` -- `getUnreadCount(token)` called after successful auth (wrapped in `.catch(() => 0)` to never block navigation); `unreadCount` added to all return paths including public path (returns 0)
+- `src/routes/+layout.svelte` -- passes `data.unreadCount ?? 0` to Sidebar
+
+### Role visibility summary
+
+| Feature | Who can see it |
+|---|---|
+| Inbox | All authenticated users |
+| Compose tab | super_admin, management |
+| My Complaints | All authenticated users |
+| All Complaints | super_admin, management |
+| Respond to complaint | super_admin, management |
+
+### All mock -- no real API
+
+When Suleiman builds endpoints, add MOCK_API guard in `src/lib/api/messages.ts` (same pattern as `staff.ts`). Endpoints to confirm:
+- `GET /api/v1/messages` -- paginated inbox
+- `POST /api/v1/messages` -- send message
+- `PATCH /api/v1/messages/{id}/read` -- mark read
+- `GET /api/v1/complaints` -- all complaints (BD only)
+- `POST /api/v1/complaints` -- submit complaint
+- `PATCH /api/v1/complaints/{id}/respond` -- respond to complaint
+
+### Result
+
+`npm run check` -- 626 files, 0 errors, 0 warnings.
