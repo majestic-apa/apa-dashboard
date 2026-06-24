@@ -798,3 +798,54 @@ When endpoints are ready: add MOCK_API guard in `src/lib/api/payments.ts` (same 
 ### Result
 
 `npm run check` -- 632 files, 0 errors, 0 warnings.
+
+---
+
+## Update 8 -- Agent Profile Features (2026-06-24)
+
+### Files created or modified
+
+- `src/lib/types/index.ts` -- Added `BankAccount` and `TerminationLetter` interfaces
+- `src/lib/mock/auth.ts` -- Added `mockBankAccount` and `mockTerminations` exports
+- `src/lib/api/profile.ts` -- Created mock-only API: `getBankAccount`, `updateBankAccount`, `getTerminations`, `submitTermination`
+- `src/routes/profile/+page.server.ts` -- Extended load to fetch bank account + terminations; added `updateBank`, `terminate`, `quickComplaint` actions
+- `src/routes/profile/+page.svelte` -- Added three new sections below existing profile/password cards
+
+### Bank account management
+
+- Read-only display shows bank name, masked account number (last 4 digits only), account name, verification status
+- Edit button reveals inline form with validation: account number must be exactly 10 digits (regex `\d{10}`)
+- On submit, `flagged_for_update` is set to true and `is_verified` to false until finance processes the update
+- Amber warning shown whenever `flagged_for_update` is true
+- Edit form closes automatically on successful save via `result.type === 'success'` check in enhance callback
+
+### Complaint submission from profile
+
+- Shortcut form for quick complaint submission (subject + message, min 20 chars)
+- Submits to `submitComplaint()` in `messages.ts` -- same store as Messages > Complaints tab
+- Success message directs user to track it in Messages > Complaints
+
+### Termination letter flow
+
+- If no existing termination: shows red warning notice + form (reason min 20 chars, effective date min 30 days, confirm checkbox)
+- Checkbox must be checked to enable the submit button (HTML required + `bind:checked` + `:disabled`)
+- Effective date min attribute set to 30 days from page load (`minTermDate` IIFE)
+- Server-side validation also enforces 30-day minimum (fix applied: spec had a mutation bug with `today.setDate()`, fixed with separate Date objects)
+- If termination already submitted: shows status card (pending/acknowledged/approved/rejected badge, dates, management response if any)
+
+### New button styles
+
+- `.btn-secondary` -- white background, gray border (for Cancel and Edit actions)
+- `.btn-danger` -- red (#dc2626) background (for Submit Termination Letter)
+
+### What Suleiman needs to build for real API
+
+- `GET /api/v1/me/bank-account` -- fetch current user's bank account
+- `PATCH /api/v1/me/bank-account` -- update bank account (triggers finance verification workflow)
+- `GET /api/v1/me/terminations` -- fetch termination letters for current user
+- `POST /api/v1/me/terminations` -- submit new termination letter
+- Complaint endpoint already tracked in Update 6 (`POST /api/v1/complaints`)
+
+### Result
+
+`npm run check` -- 633 files, 0 errors, 0 warnings.

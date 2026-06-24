@@ -302,3 +302,25 @@ export interface CommissionPeriodSummary {
   total_pending: number;
   records: AgentPaymentRecord[];
 }
+
+// ── Agent profile features ────────────────────────────────────────────────────
+
+export interface BankAccount {
+  bank_name: string;
+  account_number: string;
+  account_name: string;
+  is_verified: boolean;
+  flagged_for_update: boolean;
+  updated_at: string | null;
+}
+
+export interface TerminationLetter {
+  id: string;
+  reason: string;
+  effective_date: string;
+  status: 'pending' | 'acknowledged' | 'approved' | 'rejected';
+  submitted_at: string;
+  response: string | null;
+  responded_by: string | null;
+  responded_at: string | null;
+}

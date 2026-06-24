@@ -1,4 +1,4 @@
-import type { User, AuthResponse } from '$lib/types';
+import type { User, AuthResponse, BankAccount, TerminationLetter } from '$lib/types';
 
 export const mockUser: User = {
   id: '1',
@@ -9,6 +9,17 @@ export const mockUser: User = {
   permissions: ['all'],
   is_active: true
 };
+
+export const mockBankAccount: BankAccount = {
+  bank_name: 'First Bank of Nigeria',
+  account_number: '3012345678',
+  account_name: 'Amina Hassan',
+  is_verified: true,
+  flagged_for_update: false,
+  updated_at: '2026-05-01T00:00:00Z'
+};
+
+export const mockTerminations: TerminationLetter[] = [];
 
 export const mockAuthResponse: AuthResponse = {
   access_token: 'mock-jwt-token-super-admin',
