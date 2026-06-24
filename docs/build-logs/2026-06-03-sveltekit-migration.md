@@ -739,3 +739,62 @@ When Suleiman builds endpoints, add MOCK_API guard in `src/lib/api/messages.ts` 
 ### Result
 
 `npm run check` -- 626 files, 0 errors, 0 warnings.
+
+
+---
+
+## Update 7 -- Commission Payment Schedule (2026-06-24)
+
+### Payment rules
+
+Target: 50 completed onboardings per 2-week period.
+
+- Agent meets 50+: payment scheduled bi-weekly (next period start date)
+- Agent below 50: payment rolls to end of current calendar month
+
+### Commission rates (placeholder -- subject to management confirmation)
+
+| Type | Rate |
+|---|---|
+| Field agent direct | 100 per completed onboarding |
+| Lead override | 30 per onboarding done by agents under them |
+| Contribution commission | 50 per completed contribution |
+| Lead contribution override | 15 per contribution under them |
+
+### Files created
+
+- `src/lib/types/index.ts` -- Added `PaymentPeriod`, `AgentPaymentRecord`, `CommissionPeriodSummary` interfaces
+- `src/lib/mock/payments.ts` -- Mock data for current period (Jun 9-22, 8 agents, 87,500 due), previous period (May 26-Jun 8, 92,000 paid), next period (Jun 23-Jul 6, active/empty)
+- `src/lib/api/payments.ts` -- Mock-only API: `getCurrentPeriod`, `getPreviousPeriod`, `getNextPeriod`, `getAllPeriods`
+- `src/routes/commission/+page.server.ts` -- Loads current, previous, and (for BD roles) all periods
+- `src/routes/commission/+page.svelte` -- 3-tab page: Current Period, Payment History, All Periods
+
+### Page design
+
+Three tabs:
+
+1. Current Period -- summary cards (agents, met target, missed, total due), payment rule explanation box, agents table with progress bars
+2. Payment History -- previous period summary cards (total paid, agents paid, amount), agents table
+3. All Periods (super_admin and management only) -- clickable period cards (previous/current/next), expandable records table below selected card
+
+Table columns: Agent name, Code, Type badge (Lead/Field), Onboardings with progress bar (gold = in progress, green = met), Commission, Rule badge (gold=biweekly, grey=monthly), Payment date, Status badge, Bank account (red "Not set" warning if null)
+
+Rows with no bank account on file are highlighted with a red-tinted background.
+
+### Sidebar
+
+Commission link added to `Sidebar.svelte` after Reports, visible to `super_admin` and `management` only.
+
+### What Suleiman needs to build for real API
+
+- `GET /api/v1/commission/periods` -- list all payment periods with status
+- `GET /api/v1/commission/periods/current` -- current period summary + agent records
+- `GET /api/v1/commission/periods/previous` -- previous period summary + agent records
+- `GET /api/v1/commission/periods/{id}` -- summary for a specific period
+- `PATCH /api/v1/commission/records/{id}/status` -- update payment_status for a record (admin only)
+
+When endpoints are ready: add MOCK_API guard in `src/lib/api/payments.ts` (same pattern as `staff.ts`).
+
+### Result
+
+`npm run check` -- 632 files, 0 errors, 0 warnings.

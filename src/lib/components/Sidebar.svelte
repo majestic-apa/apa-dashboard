@@ -12,7 +12,8 @@
     { label: 'Staff', href: '/staff' },
     { label: 'Team', href: '/team', roles: ['super_admin', 'management'] },
     { label: 'Messages', href: '/messages', badge: true },
-    { label: 'Reports', href: '/reports' }
+    { label: 'Reports', href: '/reports' },
+    { label: 'Commission', href: '/commission', roles: ['super_admin', 'management'] }
   ];
 
   const visibleLinks = $derived(

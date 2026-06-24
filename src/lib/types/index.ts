@@ -262,3 +262,43 @@ export interface Complaint {
   responded_at: string | null;
   created_at: string;
 }
+
+// ── Commission payment schedule ───────────────────────────────────────────────
+
+export interface PaymentPeriod {
+  id: string;
+  start_date: string;
+  end_date: string;
+  period_type: 'biweekly' | 'monthly';
+  status: 'active' | 'closed' | 'paid';
+}
+
+export interface AgentPaymentRecord {
+  agent_id: string;
+  agent_name: string;
+  agent_code: string;
+  agent_type: 'lead' | 'field' | 'manager' | 'rm';
+  period: PaymentPeriod;
+  completed_onboardings: number;
+  completed_contributions: number;
+  direct_commission: number;
+  override_commission: number;
+  total_commission: number;
+  target: number;
+  target_met: boolean;
+  payment_rule: 'biweekly' | 'monthly';
+  payment_status: 'pending' | 'scheduled' | 'processing' | 'paid';
+  payment_date: string | null;
+  bank_account: string | null;
+}
+
+export interface CommissionPeriodSummary {
+  period: PaymentPeriod;
+  total_agents: number;
+  agents_met_target: number;
+  agents_missed_target: number;
+  total_commission_due: number;
+  total_paid: number;
+  total_pending: number;
+  records: AgentPaymentRecord[];
+}
