@@ -8,10 +8,12 @@ export interface User {
   is_active: boolean;
 }
 
+export type AgentType = 'rm' | 'manager' | 'lead' | 'field';
+
 export interface Agent {
   id: string;
   agent_code: string;
-  agent_type: 'lead' | 'field';
+  agent_type: AgentType;
   first_name: string;
   last_name: string;
   email: string | null;
@@ -183,4 +185,53 @@ export interface WithdrawalLog {
   lead_code: string;
   agent_app_version: string;
   timestamp_submitted: string;
+}
+
+// ── Agent hierarchy ──────────────────────────────────────────────────────────
+
+export interface AgentWithHierarchy extends Agent {
+  region: string | null;
+  manager_id: string | null;
+  rm_id: string | null;
+  agent_type: AgentType;
+}
+
+export interface HierarchyNode {
+  agent: AgentWithHierarchy;
+  children: HierarchyNode[];
+}
+
+export interface TeamView {
+  rms?: AgentWithHierarchy[];
+  managers?: AgentWithHierarchy[];
+  leads?: AgentWithHierarchy[];
+  field_agents?: AgentWithHierarchy[];
+}
+
+export interface CommissionSummaryAgent {
+  agent_id: string;
+  agent_name: string;
+  agent_code: string;
+  agent_type: AgentType;
+  completed_onboardings: number;
+  current_period_start: string;
+  current_period_end: string;
+  amount_earned: number;
+  payment_status: 'pending' | 'scheduled' | 'paid';
+  payment_date: string | null;
+  payment_rule: 'biweekly' | 'monthly';
+  target_met: boolean;
+  target: number;
+}
+
+export interface Message {
+  id: string;
+  subject: string;
+  body: string;
+  sender_name: string;
+  sender_id: string;
+  recipients: 'all' | 'rm' | 'manager' | 'lead' | 'field';
+  same_group_only: boolean;
+  created_at: string;
+  read: boolean;
 }

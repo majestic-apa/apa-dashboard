@@ -25,6 +25,17 @@ export const auth = {
   canAccess(roles: User['role'][]): boolean {
     if (!currentUser) return false;
     return roles.includes(currentUser.role);
+  },
+
+  // Returns true if the current user's role is at or above the required role in the hierarchy.
+  // field < lead < manager < rm < management < super_admin
+  hasRole(role: string): boolean {
+    if (!currentUser) return false;
+    const hierarchy = ['field', 'lead', 'manager', 'rm', 'management', 'super_admin'];
+    const userIndex = hierarchy.indexOf(currentUser.role);
+    const requiredIndex = hierarchy.indexOf(role);
+    if (userIndex === -1 || requiredIndex === -1) return false;
+    return userIndex >= requiredIndex;
   }
 };
 

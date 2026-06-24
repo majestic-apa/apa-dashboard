@@ -11,7 +11,15 @@ import { mockStaff } from '$lib/mock/staff';
 
 export async function getStaff(token?: string): Promise<StaffMember[]> {
   if (MOCK_API) return structuredClone(mockStaff);
-  return apiRequest<StaffMember[]>('/api/v1/users', {}, token);
+  const users = await apiRequest<Record<string, unknown>[]>('/api/v1/users', {}, token);
+  return users.map((u) => ({
+    id: String(u.id ?? ''),
+    first_name: String(u.first_name ?? ''),
+    last_name: String(u.last_name ?? ''),
+    email: String(u.email ?? ''),
+    role: u.is_superuser ? 'super_admin' : String(u.role ?? 'staff'),
+    is_active: Boolean(u.is_active ?? true)
+  }));
 }
 
 export async function createStaff(

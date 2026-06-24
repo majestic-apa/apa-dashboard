@@ -94,6 +94,12 @@
 </svelte:head>
 
 <div class="min-h-full px-8 py-8">
+  {#if data.loadError}
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:1rem;margin-bottom:1rem;color:#dc2626;font-size:.875rem;">
+      Failed to load staff data: {data.loadError}
+    </div>
+  {/if}
+
   <!-- Header -->
   <div class="mb-6 flex items-center justify-between">
     <div>

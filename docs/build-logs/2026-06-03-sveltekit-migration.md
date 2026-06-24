@@ -611,3 +611,70 @@ If the staging server is down or credentials are wrong, the login page shows the
 - Password reset body key is `new_password`
 - Non-superuser users have a `role` field in the `/users/me` response
 - Token refresh endpoint is `POST /api/v1/auth/refresh` with body `{ refresh_token }`
+
+---
+
+## Update 5 -- Role Hierarchy and Team View (2026-06-24)
+
+### What was added
+
+Agent hierarchy (BD -> RM -> Manager -> Lead -> Field Agent) modelled in types and mock data.
+New Team page visible only to super_admin and management.
+
+### Type changes (`src/lib/types/index.ts`)
+
+- `AgentType = 'rm' | 'manager' | 'lead' | 'field'` -- replaces inline union in `Agent.agent_type`
+- `Agent.agent_type` updated to `AgentType` (was `'lead' | 'field'`)
+- `AgentWithHierarchy extends Agent` -- adds `region`, `manager_id`, `rm_id` (all nullable)
+- `HierarchyNode` -- recursive tree node: `{ agent: AgentWithHierarchy; children: HierarchyNode[] }`
+- `TeamView` -- `{ rms?, managers?, leads?, field_agents? }` each `AgentWithHierarchy[]`
+- `CommissionSummaryAgent` -- placeholder for future hierarchy commission reporting
+- `Message` -- placeholder for future in-app messaging feature
+
+### Mock data changes (`src/lib/mock/agents.ts`)
+
+Full rewrite. Existing 3 leads and 8 field agents updated to `AgentWithHierarchy[]` -- gained `region`, `manager_id`, `rm_id`.
+
+New exports:
+- `mockRMs: AgentWithHierarchy[]` -- 3 RMs (North / South / West regions)
+- `mockManagers: AgentWithHierarchy[]` -- 4 Managers (2 per RM for first two RMs)
+- `mockFieldAgents` -- alias for `mockAgents`
+- `mockHierarchy: HierarchyNode[]` -- partial tree; RM-001 and RM-002 fully populated, RM-003 empty
+- `mockTeamViewBD` -- all 3 RMs + 4 Managers + 3 Leads + 8 Field Agents
+- `mockTeamViewRM` -- 2 Managers + 2 Leads + 6 Field Agents (first RM's data)
+- `mockTeamViewManager` -- 1 Lead + 3 Field Agents (first Manager's data)
+
+Hierarchy assignment:
+- RM-001 (North): MGR-001, MGR-002
+- RM-002 (South): MGR-003, MGR-004
+- RM-003 (West): no managers yet
+- MGR-001 -> Lead SPA-0001 -> APA-0001, APA-0002, APA-0003
+- MGR-002 -> Lead SPA-0002 -> APA-0004, APA-0005
+- MGR-003 -> Lead SPA-0003 -> APA-0006, APA-0007
+
+### New files
+
+- `src/lib/api/hierarchy.ts` -- `getHierarchy()`, `getMyTeam(role)`, `getTeamCommission()`; all return mock unconditionally (no Suleiman endpoints yet)
+- `src/routes/team/+page.server.ts` -- calls `getMyTeam` + `getHierarchy` (BD only); passes `{ team, hierarchy, role }` to page
+- `src/routes/team/+page.svelte` -- role-gated views:
+  - BD: 4 summary cards + Tree/List/By Region toggle; Tree uses `HierarchyNode[]` with expand/collapse; List has search + region filter; By Region groups agents by `region` field
+  - RM: 3 cards + expandable manager table with nested leads and agents
+  - Manager: 2 cards + expandable lead table with nested agents
+
+### Other changes
+
+- `src/lib/components/Sidebar.svelte` -- Team link added between Staff and Reports; shown only to `super_admin` and `management` via `visibleLinks = $derived(...)` filter on `link.roles`
+- `src/lib/stores/auth.svelte.ts` -- `hasRole(role: string): boolean` added; uses hierarchy array `['field','lead','manager','rm','management','super_admin']`; returns true if user's role index >= required role index
+
+### All mock -- no real API
+
+`src/lib/api/hierarchy.ts` has no `MOCK_API` guard and no `apiRequest` calls.
+When Suleiman builds the endpoints, add the guard and call pattern identical to `src/lib/api/staff.ts`.
+
+Endpoints to confirm with Suleiman when ready:
+- `GET /api/v1/hierarchy` -- full tree for BD
+- `GET /api/v1/agents/my-team` -- filtered team for RM / Manager
+
+### Result
+
+`npm run check` -- 620 files, 0 errors, 0 warnings.

@@ -1,6 +1,151 @@
-import type { Agent, AgentActivity } from '$lib/types';
+import type { AgentWithHierarchy, AgentActivity, HierarchyNode, TeamView } from '$lib/types';
 
-export const mockLeads: Agent[] = [
+// ── Regional Managers (RMs) ───────────────────────────────────────────────────
+
+export const mockRMs: AgentWithHierarchy[] = [
+  {
+    id: 'rm1',
+    agent_code: 'SPA-RM-001',
+    agent_type: 'rm',
+    first_name: 'Chukwuemeka',
+    last_name: 'Obi',
+    email: 'c.obi@majesticapa.com',
+    phone_number: '08012340001',
+    address: '1 Federal Secretariat Complex',
+    state: 'FCT',
+    lga: 'Abuja Municipal',
+    is_active: true,
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null,
+    region: 'North',
+    manager_id: null,
+    rm_id: null
+  },
+  {
+    id: 'rm2',
+    agent_code: 'SPA-RM-002',
+    agent_type: 'rm',
+    first_name: 'Fatima',
+    last_name: 'Usman',
+    email: 'f.usman@majesticapa.com',
+    phone_number: '08012340002',
+    address: '5 Independence Avenue',
+    state: 'Rivers',
+    lga: 'Port Harcourt',
+    is_active: true,
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null,
+    region: 'South',
+    manager_id: null,
+    rm_id: null
+  },
+  {
+    id: 'rm3',
+    agent_code: 'SPA-RM-003',
+    agent_type: 'rm',
+    first_name: 'Ibrahim',
+    last_name: 'Hassan',
+    email: 'i.hassan@majesticapa.com',
+    phone_number: '08012340003',
+    address: '12 Ahmadu Bello Way',
+    state: 'Kaduna',
+    lga: 'Kaduna North',
+    is_active: true,
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null,
+    region: 'West',
+    manager_id: null,
+    rm_id: null
+  }
+];
+
+// ── Managers ──────────────────────────────────────────────────────────────────
+
+export const mockManagers: AgentWithHierarchy[] = [
+  {
+    id: 'm1',
+    agent_code: 'SPA-MGR-001',
+    agent_type: 'manager',
+    first_name: 'Musa',
+    last_name: 'Danladi',
+    email: 'm.danladi@majesticapa.com',
+    phone_number: '08023450001',
+    address: '3 Kano Road',
+    state: 'Kano',
+    lga: 'Kano Municipal',
+    is_active: true,
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null,
+    region: 'North',
+    manager_id: null,
+    rm_id: 'rm1'
+  },
+  {
+    id: 'm2',
+    agent_code: 'SPA-MGR-002',
+    agent_type: 'manager',
+    first_name: 'Ngozi',
+    last_name: 'Eze',
+    email: 'n.eze@majesticapa.com',
+    phone_number: '08023450002',
+    address: '21 Apapa Road',
+    state: 'Lagos',
+    lga: 'Apapa',
+    is_active: true,
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null,
+    region: 'North',
+    manager_id: null,
+    rm_id: 'rm1'
+  },
+  {
+    id: 'm3',
+    agent_code: 'SPA-MGR-003',
+    agent_type: 'manager',
+    first_name: 'Yakubu',
+    last_name: 'Aliyu',
+    email: 'y.aliyu@majesticapa.com',
+    phone_number: '08023450003',
+    address: '9 Trans Amadi Road',
+    state: 'Rivers',
+    lga: 'Obio-Akpor',
+    is_active: true,
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null,
+    region: 'South',
+    manager_id: null,
+    rm_id: 'rm2'
+  },
+  {
+    id: 'm4',
+    agent_code: 'SPA-MGR-004',
+    agent_type: 'manager',
+    first_name: 'Aisha',
+    last_name: 'Bello',
+    email: 'a.bello@majesticapa.com',
+    phone_number: '08023450004',
+    address: '14 Old Aba Road',
+    state: 'Rivers',
+    lga: 'Port Harcourt',
+    is_active: true,
+    lead_agent_id: null,
+    lead_agent_name: null,
+    lead_agent_code: null,
+    region: 'South',
+    manager_id: null,
+    rm_id: 'rm2'
+  }
+];
+
+// ── Leads ─────────────────────────────────────────────────────────────────────
+
+export const mockLeads: AgentWithHierarchy[] = [
   {
     id: 'l1',
     agent_code: 'SPA-0001',
@@ -15,7 +160,10 @@ export const mockLeads: Agent[] = [
     is_active: true,
     lead_agent_id: null,
     lead_agent_name: null,
-    lead_agent_code: null
+    lead_agent_code: null,
+    region: 'North',
+    manager_id: 'm1',
+    rm_id: 'rm1'
   },
   {
     id: 'l2',
@@ -31,7 +179,10 @@ export const mockLeads: Agent[] = [
     is_active: true,
     lead_agent_id: null,
     lead_agent_name: null,
-    lead_agent_code: null
+    lead_agent_code: null,
+    region: 'North',
+    manager_id: 'm2',
+    rm_id: 'rm1'
   },
   {
     id: 'l3',
@@ -47,11 +198,16 @@ export const mockLeads: Agent[] = [
     is_active: true,
     lead_agent_id: null,
     lead_agent_name: null,
-    lead_agent_code: null
+    lead_agent_code: null,
+    region: 'South',
+    manager_id: 'm3',
+    rm_id: 'rm2'
   }
 ];
 
-export const mockAgents: Agent[] = [
+// ── Field Agents ──────────────────────────────────────────────────────────────
+
+export const mockAgents: AgentWithHierarchy[] = [
   {
     id: 'a1',
     agent_code: 'APA-0001',
@@ -66,7 +222,10 @@ export const mockAgents: Agent[] = [
     is_active: true,
     lead_agent_id: 'l1',
     lead_agent_name: 'Chukwuemeka Okafor',
-    lead_agent_code: 'SPA-0001'
+    lead_agent_code: 'SPA-0001',
+    region: 'North',
+    manager_id: 'm1',
+    rm_id: 'rm1'
   },
   {
     id: 'a2',
@@ -82,7 +241,10 @@ export const mockAgents: Agent[] = [
     is_active: true,
     lead_agent_id: 'l1',
     lead_agent_name: 'Chukwuemeka Okafor',
-    lead_agent_code: 'SPA-0001'
+    lead_agent_code: 'SPA-0001',
+    region: 'North',
+    manager_id: 'm1',
+    rm_id: 'rm1'
   },
   {
     id: 'a3',
@@ -98,7 +260,10 @@ export const mockAgents: Agent[] = [
     is_active: true,
     lead_agent_id: 'l2',
     lead_agent_name: 'Fatima Abubakar',
-    lead_agent_code: 'SPA-0002'
+    lead_agent_code: 'SPA-0002',
+    region: 'North',
+    manager_id: 'm2',
+    rm_id: 'rm1'
   },
   {
     id: 'a4',
@@ -114,7 +279,10 @@ export const mockAgents: Agent[] = [
     is_active: false,
     lead_agent_id: 'l2',
     lead_agent_name: 'Fatima Abubakar',
-    lead_agent_code: 'SPA-0002'
+    lead_agent_code: 'SPA-0002',
+    region: 'North',
+    manager_id: 'm2',
+    rm_id: 'rm1'
   },
   {
     id: 'a5',
@@ -130,7 +298,10 @@ export const mockAgents: Agent[] = [
     is_active: true,
     lead_agent_id: 'l1',
     lead_agent_name: 'Chukwuemeka Okafor',
-    lead_agent_code: 'SPA-0001'
+    lead_agent_code: 'SPA-0001',
+    region: 'North',
+    manager_id: 'm1',
+    rm_id: 'rm1'
   },
   {
     id: 'a6',
@@ -146,7 +317,10 @@ export const mockAgents: Agent[] = [
     is_active: true,
     lead_agent_id: 'l3',
     lead_agent_name: 'Biodun Adeleke',
-    lead_agent_code: 'SPA-0003'
+    lead_agent_code: 'SPA-0003',
+    region: 'South',
+    manager_id: 'm3',
+    rm_id: 'rm2'
   },
   {
     id: 'a7',
@@ -162,7 +336,10 @@ export const mockAgents: Agent[] = [
     is_active: true,
     lead_agent_id: 'l3',
     lead_agent_name: 'Biodun Adeleke',
-    lead_agent_code: 'SPA-0003'
+    lead_agent_code: 'SPA-0003',
+    region: 'South',
+    manager_id: 'm3',
+    rm_id: 'rm2'
   },
   {
     id: 'a8',
@@ -178,9 +355,87 @@ export const mockAgents: Agent[] = [
     is_active: true,
     lead_agent_id: 'l2',
     lead_agent_name: 'Fatima Abubakar',
-    lead_agent_code: 'SPA-0002'
+    lead_agent_code: 'SPA-0002',
+    region: 'North',
+    manager_id: 'm2',
+    rm_id: 'rm1'
   }
 ];
+
+// Alias used in team views and hierarchy
+export const mockFieldAgents = mockAgents;
+
+// ── Hierarchy tree (partial — first RM's chain fully populated) ───────────────
+
+export const mockHierarchy: HierarchyNode[] = [
+  {
+    agent: mockRMs[0],
+    children: [
+      {
+        agent: mockManagers[0],
+        children: [
+          {
+            agent: mockLeads[0],
+            children: mockFieldAgents.slice(0, 3).map((a) => ({ agent: a, children: [] }))
+          }
+        ]
+      },
+      {
+        agent: mockManagers[1],
+        children: [
+          {
+            agent: mockLeads[1],
+            children: mockFieldAgents.slice(3, 6).map((a) => ({ agent: a, children: [] }))
+          }
+        ]
+      }
+    ]
+  },
+  {
+    agent: mockRMs[1],
+    children: [
+      {
+        agent: mockManagers[2],
+        children: [
+          {
+            agent: mockLeads[2],
+            children: mockFieldAgents.slice(6).map((a) => ({ agent: a, children: [] }))
+          }
+        ]
+      },
+      {
+        agent: mockManagers[3],
+        children: []
+      }
+    ]
+  },
+  {
+    agent: mockRMs[2],
+    children: []
+  }
+];
+
+// ── Team views per role ───────────────────────────────────────────────────────
+
+export const mockTeamViewBD: TeamView = {
+  rms: mockRMs,
+  managers: mockManagers,
+  leads: mockLeads,
+  field_agents: mockFieldAgents
+};
+
+export const mockTeamViewRM: TeamView = {
+  managers: mockManagers.slice(0, 2),
+  leads: mockLeads.slice(0, 2),
+  field_agents: mockFieldAgents.slice(0, 6)
+};
+
+export const mockTeamViewManager: TeamView = {
+  leads: mockLeads.slice(0, 1),
+  field_agents: mockFieldAgents.slice(0, 3)
+};
+
+// ── Legacy activity log (no longer shown in UI) ───────────────────────────────
 
 export const mockAgentActivity: AgentActivity[] = [
   {

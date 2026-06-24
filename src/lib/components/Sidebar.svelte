@@ -7,11 +7,16 @@
 
   let { user }: { user: User | null } = $props();
 
-  const navLinks = [
+  const navLinks: { label: string; href: string; roles?: string[] }[] = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Staff', href: '/staff' },
+    { label: 'Team', href: '/team', roles: ['super_admin', 'management'] },
     { label: 'Reports', href: '/reports' }
   ];
+
+  const visibleLinks = $derived(
+    navLinks.filter((link) => !link.roles || (user !== null && link.roles.includes(user.role)))
+  );
 
   function isActive(href: string): boolean {
     return page.url.pathname === href || page.url.pathname.startsWith(href + '/');
@@ -38,7 +43,7 @@
 
   <!-- Nav links -->
   <nav class="mt-4 flex-1 px-3">
-    {#each navLinks as link}
+    {#each visibleLinks as link}
       {@const active = isActive(link.href)}
       <a
         href={link.href}

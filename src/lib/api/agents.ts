@@ -1,6 +1,26 @@
-import type { Agent } from '$lib/types';
+import type { Agent, AgentType } from '$lib/types';
 import { MOCK_API, apiRequest } from './client';
 import { mockLeads, mockAgents } from '$lib/mock/agents';
+
+function mapApiAgent(raw: Record<string, unknown>): Agent {
+  const leadId = String(raw.lead_agent_id ?? raw.lead_id ?? '');
+  return {
+    id: String(raw.id ?? ''),
+    agent_code: String(raw.agent_code ?? ''),
+    agent_type: ((raw.agent_type ?? 'field') as AgentType),
+    first_name: String(raw.first_name ?? ''),
+    last_name: String(raw.last_name ?? ''),
+    email: (raw.email as string | null) ?? null,
+    phone_number: String(raw.phone_number ?? ''),
+    address: String(raw.address ?? ''),
+    state: String(raw.state ?? ''),
+    lga: String(raw.lga ?? ''),
+    is_active: Boolean(raw.is_active ?? true),
+    lead_agent_id: leadId || null,
+    lead_agent_name: ((raw.lead_agent_name ?? raw.lead_name) as string | null) ?? null,
+    lead_agent_code: ((raw.lead_agent_code ?? raw.lead_code) as string | null) ?? null
+  };
+}
 
 // Assumed real endpoints -- confirm with Suleiman before go-live:
 //   GET  /api/v1/agents?agent_type=lead
@@ -12,12 +32,14 @@ import { mockLeads, mockAgents } from '$lib/mock/agents';
 
 export async function getLeads(token?: string): Promise<Agent[]> {
   if (MOCK_API) return structuredClone(mockLeads);
-  return apiRequest<Agent[]>('/api/v1/agents?agent_type=lead', {}, token);
+  const raw = await apiRequest<Record<string, unknown>[]>('/api/v1/agents?agent_type=lead', {}, token);
+  return raw.map(mapApiAgent);
 }
 
 export async function getAgents(token?: string): Promise<Agent[]> {
   if (MOCK_API) return structuredClone(mockAgents);
-  return apiRequest<Agent[]>('/api/v1/agents?agent_type=field', {}, token);
+  const raw = await apiRequest<Record<string, unknown>[]>('/api/v1/agents?agent_type=field', {}, token);
+  return raw.map(mapApiAgent);
 }
 
 export async function getAllAgents(token?: string): Promise<Agent[]> {
